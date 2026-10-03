@@ -75,3 +75,13 @@ The theme button cycles through System, Light and Dark and remembers your choice
 底部操作栏是独立浮动玻璃层，直接使用折射滤镜；前景文字和按钮保持清晰。父级编辑区不再创建 backdrop-filter 隔离层，避免阻断背景采样。以实际滚动文字和输入框轮廓穿过操作栏边缘后的弯曲来验证渲染，而不以贴图更新次数作为视觉生效证据。
 
 视觉依据：[Apple — Meet Liquid Glass](https://developer.apple.com/videos/play/wwdc2025/219/)，重点为背景内容的透镜变形、边缘折射和前景层次。
+
+### Glass material and interaction
+
+All buttons, inputs, selects, text areas and card shells now have their own size-aware optical maps. Cards render the backdrop filter on a separate paint layer so child controls do not lose access to the scene beneath the card. The Discord preview content remains readable inside its glass shell. Painted bright rims have been removed.
+
+The lens is orthographic: the center is neutral, while the maximum displacement occurs within the outer bezel (height-profile slope peaks at 25% of that band). Displacement is amplified 1.5× and RGB offsets additionally use 1.18 / 1 / 0.82 artistic gains; this deliberately exaggerates dispersion rather than claiming physically exact glass. Light mode compresses backdrop RGB with `0.84 × channel + 0.10`, without changing foreground text. Larger labels, line spacing and a two-column action area improve readability.
+
+Buttons and disclosures use a damped spring on press/release (stiffness 420, damping 25, rest scale 1, pressed scale 0.965), supporting pointer cancellation, keyboard use and reduced-motion settings. No pointer-following light is used.
+
+Open-source implementation references reviewed: [rdev/liquid-glass-react](https://github.com/rdev/liquid-glass-react) (edge-only refraction), [DevSam7t3/liquid-glass](https://github.com/DevSam7t3/liquid-glass) (optics and spring interaction). The implementation here is original vanilla JavaScript; neither package nor source code was copied into this project.

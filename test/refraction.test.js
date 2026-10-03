@@ -23,3 +23,8 @@ test('view and geometry change maps; RGB channels have physical dispersion',()=>
  assert.notDeepEqual(a[1],b[1]);assert.notDeepEqual(a[1],c[1]);assert.notDeepEqual(a[0],a[2]);
  for(const buffer of a){assert.equal(buffer.length,64*32*4);for(let i=3;i<buffer.length;i+=4)assert.equal(buffer[i],255);}
 });
+test('strongest displacement is in the narrow edge band; center remains neutral',()=>{
+ const params={width:240,height:120,mapWidth:240,mapHeight:120};const map=buildMaps(params)[1];
+ const at=x=>Math.abs(map[(60*240+x)*4]-128);const row=Array.from({length:120},(_,x)=>at(x));const peak=row.indexOf(Math.max(...row));
+ assert.ok(peak>0&&peak<15,`peak must be near edge, got ${peak}`);assert.ok(at(60)<=1);assert.ok(at(110)<=1);assert.ok(row[peak]>15);
+});

@@ -48,7 +48,7 @@ const server=http.createServer(async(req,res)=>{
       });
       return reply(200,{config,status});
     }
-    const files={'/':'index.html','/app.js':'app.js','/style.css':'style.css','/glass.css':'glass.css','/i18n.js':'i18n.js','/edges.js':'edges.js','/optics.js':'optics.js','/locale-motion.js':'locale-motion.js','/refraction.js':'refraction.js','/theme.js':'theme.js'};
+    const files={'/':'index.html','/app.js':'app.js','/style.css':'style.css','/glass.css':'glass.css','/i18n.js':'i18n.js','/edges.js':'edges.js','/optics.js':'optics.js','/locale-motion.js':'locale-motion.js','/refraction.js':'refraction.js','/theme.js':'theme.js','/elastic.js':'elastic.js'};
     if(req.method!=='GET' || !files[pathname]) return reply(404,{error:'Not found'});
     const file=files[pathname];res.writeHead(200,{'Content-Type':mime[path.extname(file)],'Cache-Control':'no-cache'});res.end(await readFile(path.join(root,'public',file)));
   } catch(e){reply(400,{error:e.message});}

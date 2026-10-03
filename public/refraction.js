@@ -1,7 +1,7 @@
 // Geometric optics in CSS-pixel space. Trace through a rounded, beveled front
 // surface and a flat rear interface using Snell's law. RGB IORs model dispersion.
 export const IOR = [1.514, 1.522, 1.534];
-export const DISPLACEMENT_SCALE = 100;
+export const DISPLACEMENT_SCALE = 160;
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 export function normalize(v){const m=Math.hypot(...v);return v.map(x=>x/m);}
 export function refract(incident,normal,eta){
@@ -14,8 +14,9 @@ export function surfaceHeight(x,y,width,height,radius,thickness){
  const r=Math.min(radius,width/2,height/2);
  const qx=Math.abs(x-width/2)-(width/2-r),qy=Math.abs(y-height/2)-(height/2-r);
  const signed=Math.hypot(Math.max(qx,0),Math.max(qy,0))+Math.min(Math.max(qx,qy),0)-r;
- const u=clamp(-signed/Math.min(18,Math.max(5,r*.65)),0,1);
- return 2+thickness*u*u*(3-2*u);
+ const u=clamp(-signed/Math.min(26,Math.max(9,r*.85)),0,1);
+ // Integral of 20u(1-u)^3: maximum slope at 25% of the narrow bezel.
+ return 2+thickness*(1-(1-u)**4*(1+4*u));
 }
 export function surfaceSample(x,y,w,h,radius,thickness){
  const z=surfaceHeight(x,y,w,h,radius,thickness),e=.5;
@@ -35,10 +36,12 @@ export function buildMaps({width,height,radius=24,thickness=9,viewX=0,viewY=0,ma
  for(let j=0;j<mapHeight;j++)for(let i=0;i<mapWidth;i++){
   const x=(i+.5)*width/mapWidth,y=(j+.5)*height/mapHeight;
   const {depth,normal}=surfaceSample(x,y,width,height,radius,thickness);
-  const incident=normalize([(x-width/2-viewX*160)/1000,(y-height/2-viewY*160)/1000,-1]);
+  const incident=normalize([-viewX*.16,-viewY*.16,-1]);
   const index=(j*mapWidth+i)*4;
   for(let channel=0;channel<3;channel++){
-   const shift=traceOffset(incident,normal,depth,IOR[channel]);const b=buffers[channel];
+   // Deliberately amplify dispersion for this material, beyond physical glass.
+   const gain=1.5*[1.18,1,.82][channel];
+   const shift=traceOffset(incident,normal,depth,IOR[channel]).map(v=>v*gain);const b=buffers[channel];
    b[index]=Math.round((clamp(shift[0]/DISPLACEMENT_SCALE,-.5,.5)+.5)*255);
    b[index+1]=Math.round((clamp(shift[1]/DISPLACEMENT_SCALE,-.5,.5)+.5)*255);b[index+2]=128;b[index+3]=255;
   }

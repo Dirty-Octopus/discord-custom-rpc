@@ -1,3 +1,4 @@
+import {initElastic} from './elastic.js';
 import {initTheme} from './theme.js';
 import {initOptics} from './optics.js';
 import {animateLocale} from './locale-motion.js';
@@ -66,4 +67,4 @@ setInterval(()=>{updateTimer(collect().activity);},1000);
 let previousError='';setInterval(async()=>{if(busy)return;try{const r=await fetch('/api/state');if(!r.ok)throw Error('服务响应异常');const s=await r.json();updateStatus(s.status);if(s.status.error!==previousError){previousError=s.status.error;if(s.status.error)notice(s.status.error,true);else if(s.status.applied)notice('Discord 已确认更新。');}}catch{$('connection').textContent='本地服务已离线';$('led').className='led';translateUI();}},3000);
 
 $('languageToggle').onclick=()=>animateLocale(()=>{toggleLanguage();render();updateStatus(currentStatus);notice(lastNotice,lastNoticeError);});
-translateUI();initTheme();initOptics();initEdgeEffects();
+translateUI();initTheme();initOptics();initEdgeEffects();initElastic();
