@@ -1,0 +1,8 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {validateConfig,defaults} from '../lib/activity.js';
+const config=activity=>({clientId:'123456789012345678',activity});
+test('all writable fields survive validation',()=>{const c=config({type:2,name:'Music',status_display_type:2,details:'Track',details_url:'https://example.com',state:'Album',state_url:'https://example.com',timestamps:{start:1700000000000,end:1700000300000},assets:{large_image:'cover',small_image:'https://example.com/a.png',large_text:'Cover',small_text:'Small',large_url:'https://example.com',small_url:'https://example.com',invite_cover_image:'banner'},party:{id:'party',size:[1,4],privacy:1},secrets:{join:'join',spectate:'spectate',match:'match'},instance:false,buttons:[{label:'Open',url:'https://example.com'}]});assert.deepEqual(validateConfig(c,true).activity,c.activity);});
+test('draft can omit client ID but publishing cannot',()=>{assert.doesNotThrow(()=>validateConfig(defaults));assert.throws(()=>validateConfig(defaults,true),/Application ID/);});
+test('invalid payloads fail before reaching Discord',()=>{for(const a of [{type:4},{type:1,url:'https://example.com'},{buttons:[{label:'X',url:'javascript:alert(1)'}]},{party:{size:[4,2]}},{timestamps:{start:5,end:4}},{timestamps:{start:NaN}},{details:'x'.repeat(129)},{flags:1},{assets:{wrong:'x'}},{buttons:Array(3).fill({label:'a',url:'https://example.com'})}])assert.throws(()=>validateConfig(config(a)));});
+test('empty fields omitted and Unicode counted as codepoints',()=>{assert.deepEqual(validateConfig(config({details:'',assets:{large_image:''},state:'🎧'.repeat(128)})).activity,{type:0,state:'🎧'.repeat(128)});});
