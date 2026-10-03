@@ -63,10 +63,15 @@ The interface uses a web interpretation of Liquid Glass. Switch between English 
 
 右上角主题按钮依次切换「自动 → 浅色 → 深色」，刷新后保留选择。自动模式响应系统主题变化；语言、主题和边缘效果是独立偏好。
 
-折射不再读取固定置换图片。`public/refraction.js` 根据每个玻璃组件的实际尺寸和圆角构造带倒角的厚度表面，计算高度梯度得到表面法线，使用 Snell 定律追踪空气 → 玻璃 → 空气两次折射。RGB 使用 1.514 / 1.522 / 1.534 的折射率模拟色散，再投影到背景采样平面。`public/optics.js` 在视角、滚动或尺寸改变时生成三个独立 PNG 位移缓冲，交由 SVG 滤镜采样浏览器当前背景。鼠标位置控制模拟观察视角与高光位置。
+折射不再读取固定置换图片。`public/refraction.js` 根据每个玻璃组件的实际尺寸和圆角构造带倒角的厚度表面，计算高度梯度得到表面法线，使用 Snell 定律追踪空气 → 玻璃 → 空气两次折射。RGB 使用 1.514 / 1.522 / 1.534 的折射率模拟色散，再投影到背景采样平面。`public/optics.js` 在组件尺寸改变时生成三个独立 PNG 位移缓冲，交由 SVG 滤镜采样浏览器当前背景。镜头固定为正视角，不使用鼠标跟随或悬停高光。贴图表达玻璃几何形状，浏览器每次合成都会重新采样滚动中的真实背景，因此无需用鼠标驱动贴图变化。
 
-这是几何光学驱动的**屏幕空间模拟**：背景为二维合成图，不具有真实场景深度；没有多次反射、焦散或完整路径追踪。全反射位置采用无偏移采样回退。为控制性能，贴图采用低分辨率并由浏览器插值；更新上限约 30 Hz，只处理可见且发生变化的组件，页面隐藏时停止更新。静止视角下不空转。系统减少动态效果时固定视角；减少透明度时回退为实色组件。
+这是几何光学驱动的**屏幕空间模拟**：背景为二维合成图，不具有真实场景深度；没有多次反射、焦散或完整路径追踪。全反射位置采用无偏移采样回退。为控制性能，贴图采用低分辨率并由浏览器插值；更新上限约 30 Hz，只处理可见且发生变化的组件，页面隐藏时停止更新。静止视角下不空转。减少透明度时回退为实色组件。
 
-The theme button cycles through System, Light and Dark and remembers your choice. Live refraction uses component-specific beveled surface normals, two Snell-law interfaces and separate RGB refractive indices. Maps are recomputed for pointer/view, scroll and resize changes; SVG filters sample the current browser backdrop. This is a screen-space optical simulation, not a full 3D path tracer. Chromium-based browsers are recommended for SVG backdrop filters; unsupported browsers retain translucent glass styling.
+The theme button cycles through System, Light and Dark and remembers your choice. Live refraction uses component-specific beveled surface normals, two Snell-law interfaces and separate RGB refractive indices. Geometry maps are recomputed on resize; SVG filters continuously sample the actual scrolling backdrop. There is no pointer-following view or light effect. This is a screen-space optical simulation, not a full 3D path tracer. Chromium-based browsers are recommended for SVG backdrop filters; unsupported browsers retain translucent glass styling.
 
 `npm test` includes analytic Snell-law checks, total internal reflection, neutral-index behavior, mirrored normals, RGB dispersion, and view/geometry-dependent map updates in addition to RPC and HTTP tests.
+
+
+底部操作栏是独立浮动玻璃层，直接使用折射滤镜；前景文字和按钮保持清晰。父级编辑区不再创建 backdrop-filter 隔离层，避免阻断背景采样。以实际滚动文字和输入框轮廓穿过操作栏边缘后的弯曲来验证渲染，而不以贴图更新次数作为视觉生效证据。
+
+视觉依据：[Apple — Meet Liquid Glass](https://developer.apple.com/videos/play/wwdc2025/219/)，重点为背景内容的透镜变形、边缘折射和前景层次。

@@ -62,3 +62,15 @@ button:before{content:'';position:absolute;inset:0;border-radius:inherit;padding
 [data-theme=dark] #notice{background:#183c309e;border-color:#53826d;color:#bbe9cc}[data-theme=dark] #notice.error{background:#4b292b9e;border-color:#9e6667;color:#f2c0bf}
 @media(max-width:960px){.connection{max-width:290px}.connection>span:not(.led){font-size:10px}}@media(max-width:740px){.connection{max-width:180px}.brand{font-size:16px}.brand .mark{width:32px;min-width:32px;height:38px}.brand small{letter-spacing:1px;font-size:7px}header{padding:14px}.utility{padding:6px 8px}}
 @media(prefers-reduced-transparency:reduce){[data-theme=dark] header,[data-theme=dark] .editor,[data-theme=dark] .runtime,[data-theme=dark] .help,[data-theme=dark] .actions,[data-theme=dark] input,[data-theme=dark] select,[data-theme=dark] textarea,[data-theme=dark] button{background:#192536;background-image:none}[data-theme=dark] .preview-glass{background:#26374b}}
+/* A separate floating optical layer samples the actual scrolling form beneath.
+   No pointer-following lighting; foreground controls stay above the lens. */
+.editor{overflow:visible;backdrop-filter:none;-webkit-backdrop-filter:none}
+.actions{z-index:10;bottom:5.5vh;border-radius:24px;margin:12px;isolation:auto;background:rgba(228,239,249,.16);border:1px solid #ffffff8c;box-shadow:inset 0 1px 1px #ffffffab,0 8px 24px #132b4930;-webkit-backdrop-filter:var(--refraction-filter,blur(12px));backdrop-filter:var(--refraction-filter,blur(12px))}
+[data-theme=dark] .actions{background:rgba(17,29,45,.26);border-color:#d6eaff55;box-shadow:inset 0 1px 1px #e0f1ff69,0 8px 24px #03081066}
+.actions>span,.actions>button{position:relative;z-index:1}.actions>span{font-weight:600}.actions button{background-color:#ffffff2e}[data-theme=dark] .actions button{background-color:#37557380}
+.live-glass{background-image:linear-gradient(125deg,#ffffff0e,#ffffff02 55%,#ffffff08)}
+.preview-glass:before{background:linear-gradient(135deg,#ffffffab,#ffffff08 35%,#ffffff08 65%,#cfe8ff69)}
+button:hover,[data-theme=dark] button:hover,.primary:hover{background-color:inherit;box-shadow:inherit}
+@media(prefers-reduced-transparency:reduce){.actions,[data-theme=dark] .actions{backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--bg)}}
+.actions>#savedNote{width:fit-content;max-width:100%;margin-right:auto;padding:2px 7px;border-radius:6px;background:#eaf0f7b8;color:#324b65}
+[data-theme=dark] .actions>#savedNote{background:#101722bd;color:#d1e4f8}
